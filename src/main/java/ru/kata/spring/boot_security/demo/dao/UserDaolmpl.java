@@ -1,10 +1,12 @@
 package ru.kata.spring.boot_security.demo.dao;
 
+import com.sun.xml.bind.v2.TODO;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.models.Role;
@@ -45,6 +47,8 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
     @Transactional
     public void saveUser(User user) {
         try {
+            String crypro = new BCryptPasswordEncoder().encode((user.getPassword()));
+            user.setPassword(crypro);
             entityManager.persist(user);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -59,6 +63,12 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
             userResult.setUsername(user.getUsername());
             userResult.setEmail(user.getEmail());
             entityManager.merge(userResult);
+
+            String crypto = new BCryptPasswordEncoder().encode((user.getPassword()));
+            userResult.setPassword(crypto);
+
+            entityManager.merge(userResult);
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -85,6 +95,7 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
         }
         return null;
     }
+
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -92,12 +103,7 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
         if(user == null) {
             throw new UsernameNotFoundException(String.format("User '%s' not found", username));
         }
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-                mapRolesToAuthorities(user.getRoles()));
-    }
-
-    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
-        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getName())).collect(Collectors.toList());
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getAuthorities());
     }
 }
 
