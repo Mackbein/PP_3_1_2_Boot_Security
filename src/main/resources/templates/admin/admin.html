@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+<style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+</style>
+</head>
+<body>
+
+<h2>User Table</h2>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Age</th>
+        <th>Email</th>
+        <th>Password</th>
+    </tr>
+    <div th:each="user : ${users}">
+        <tr>
+            <th><p href="" th:text="${user.getId()}"></p></th>
+            <th><p href="" th:text="${user.getUsername()}"></p></th>
+            <th><p href="" th:text="${user.getAge()}"></p></th>
+            <th><p href="" th:text="${user.getEmail()}"></p></th>
+            <th><p href="" th:text="${user.getPassword()}"></p></th>
+            <th><a th:href="@{/users/{id}(id=${user.getId()})}">Edit</a></th>
+        </tr>
+</div>
+
+</table>
+
+<a href="/admin/new">Create new User</a>
+
+</body>
+</html>
