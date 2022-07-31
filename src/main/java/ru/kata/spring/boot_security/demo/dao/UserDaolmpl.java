@@ -1,22 +1,19 @@
 package ru.kata.spring.boot_security.demo.dao;
 
-import com.sun.xml.bind.v2.TODO;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Repository
 public class UserDaolmpl implements UserDao, UserDetailsService {
@@ -64,8 +61,11 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
             userResult.setEmail(user.getEmail());
             entityManager.merge(userResult);
 
-            String crypto = new BCryptPasswordEncoder().encode((user.getPassword()));
-            userResult.setPassword(crypto);
+
+            if (!Objects.equals(userResult.getPassword(), user.getPassword())) {
+                String crypto = new BCryptPasswordEncoder().encode((user.getPassword()));
+                userResult.setPassword(crypto);
+            }
 
             entityManager.merge(userResult);
 

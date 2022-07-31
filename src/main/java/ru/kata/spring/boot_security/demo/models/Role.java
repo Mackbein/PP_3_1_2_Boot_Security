@@ -17,7 +17,8 @@ public class Role implements GrantedAuthority {
     @Column
     private int id;
 
-    @ManyToMany(mappedBy = "roles")
+    @OneToMany(mappedBy = "roles",
+    cascade = CascadeType.ALL)
     private Set<User> users;
 
     @Column
