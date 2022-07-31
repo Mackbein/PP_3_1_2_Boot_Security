@@ -105,6 +105,15 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
         }
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getAuthorities());
     }
+
+    public List<Role> getAllRoles() {
+        try {
+            return entityManager.createQuery("FROM Role").getResultList();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
 }
 
 
