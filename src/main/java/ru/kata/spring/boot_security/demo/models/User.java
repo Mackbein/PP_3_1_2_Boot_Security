@@ -7,8 +7,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table
@@ -18,6 +19,12 @@ public class User implements UserDetails  {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private int id;
+
+    @Column
+    private String firstName;
+
+    @Column
+    private String lastName;
     @Column
     private String username;
     @Column
@@ -25,23 +32,27 @@ public class User implements UserDetails  {
     @Column
     private int age;
 
+
+
+
     @Column
     private String password;
 
-    @OneToMany(cascade = {CascadeType.ALL})
+    @ManyToMany(cascade = {CascadeType.REFRESH, CascadeType.PERSIST} )
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-
-    private List<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     public User() {
 
     }
 
-    public User(String username, String email, int age) {
+    public User(String username, String email, int age, String firstName, String lastName) {
+        this.lastName = lastName;
+        this.firstName = firstName;
         this.username = username;
         this.email = email;
         this.age = age;
@@ -82,23 +93,27 @@ public class User implements UserDetails  {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id && age == user.age && Objects.equals(username, user.username) && Objects.equals(email, user.email);
+        return id == user.id && age == user.age && Objects.equals(username, user.username)
+                && Objects.equals(email, user.email) && Objects.equals(firstName, user.firstName)
+                && Objects.equals(lastName, user.lastName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, age, email);
+        return Objects.hash(id, username, age, email, firstName, lastName);
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", age=" + age +
                 ", password='" + password + '\'' +
-                ", role=" + roles +
+                ", roles=" + roles +
                 '}';
     }
 }

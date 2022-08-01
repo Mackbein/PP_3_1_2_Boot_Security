@@ -46,6 +46,8 @@
                                 <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
                                     <th>Username</th>
                                     <th>Age</th>
                                     <th>Email</th>
@@ -57,6 +59,8 @@
                                 <tbody>
                                 <tr th:each="user : ${users}">
                                     <td th:utext="${user.id}">ID</td>
+                                    <td th:utext="${user.firstName}">First Name</td>
+                                    <td th:utext="${user.lastName}">Last Name</td>
                                     <td th:utext="${user.username}">Username</td>
                                     <td th:utext="${user.age}">age</td>
                                     <td th:utext="${user.email}">email</td>
@@ -88,6 +92,12 @@
                                                                        name="id" id="del_id" readonly
                                                                        th:value="${user.id}">
                                                             </p>
+                                                            <p><label for="firstName">First Name</label>
+                                                            <input type="text" name="firstName"
+                                                                   th:value="${user.firstName}" id="firstName"></p>
+                                                            <p><label for="lastName">Last Name</label>
+                                                            <input type="text" name="username"
+                                                                   th:value="${user.lastName}" id="lastName"></p>
                                                             <p><label for="Username">Username</label>
                                                                 <input type="text" name="username"
                                                                        th:value="${user.username}" id="Username"></p>
@@ -104,7 +114,7 @@
                                                             <p>
                                                                 <select id="roles" name="roles"
                                                                         class="form-control"
-                                                                        th:multiple="${roles.size()}">
+                                                                        th:multiple="${roles.size()}" required>
                                                                     <option selected>Выберите роль</option>
                                                                     <option th:each="role : ${roles}"
                                                                             th:value="${role}"
@@ -153,6 +163,14 @@
                                                                        name="id" id="del_id" readonly
                                                                        th:value="${user.id}">
                                                             </p>
+                                                            <p><label for="firstName">First Name</label>
+                                                                <input class="form-control form-control-sm" type="text"
+                                                                       name="firstName" readonly
+                                                                       th:value="${user.firstName}" id="firstName"></p>
+                                                            <p><label for="lastName">Last Name</label>
+                                                                <input class="form-control form-control-sm" type="text"
+                                                                       name="lastName" readonly
+                                                                       th:value="${user.lastName}" id="lastName"></p>
                                                             <p><label for="username">Username</label>
                                                                 <input class="form-control form-control-sm" type="text"
                                                                        name="username" readonly
@@ -174,7 +192,7 @@
                                                                         class="form-control"
                                                                         th:multiple="${roles.size()}">
                                                                     <option th:each="role : ${user.roles}"
-                                                                            th:value="${role}"
+                                                                            th:value="${role.getId()}"
                                                                             th:text="${role.toString()}"
                                                                             th:selected="${user.roles.contains(role)}">
                                                                     </option>
@@ -210,9 +228,19 @@
                                   style="width: 300px;"
                                   class="form-signin mx-auto font-weight-bold">
                                 <p>
+                                    <label>First Name</label>
+                                    <input class="form-control form-control-sm" type="text"
+                                           th:field="*{firstName}" placeholder="First name" required autofocus>
+                                </p>
+                                <p>
+                                    <label>Last Name</label>
+                                    <input class="form-control form-control-sm" type="text"
+                                           th:field="*{lastName}" placeholder="Last name" required autofocus>
+                                </p>
+                                <p>
                                     <label>Username</label>
                                     <input class="form-control form-control-sm" type="text"
-                                           th:field="*{username}" placeholder="First name" required autofocus>
+                                           th:field="*{username}" placeholder="Username" required autofocus>
                                 </p>
                                 <p>
                                     <label>Age</label>
@@ -254,6 +282,8 @@
                         <thead>
                         <tr>
                             <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
                             <th>Username</th>
                             <th>Age</th>
                             <th>Email</th>
@@ -263,6 +293,8 @@
                         <tbody>
                         <tr th:object="${authorizedUser}">
                             <td th:utext="${authorizedUser.id}"></td>
+                            <td th:utext="${authorizedUser.firstName}"></td>
+                            <td th:utext="${authorizedUser.lastName}"></td>
                             <td th:utext="${authorizedUser.username}"></td>
                             <td th:utext="${authorizedUser.age}"></td>
                             <td th:utext="${authorizedUser.email}"></td>

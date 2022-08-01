@@ -12,8 +12,7 @@ import ru.kata.spring.boot_security.demo.models.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Repository
 public class UserDaolmpl implements UserDao, UserDetailsService {
@@ -46,7 +45,8 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
         try {
             String crypro = new BCryptPasswordEncoder().encode((user.getPassword()));
             user.setPassword(crypro);
-            entityManager.persist(user);
+            user.setRoles(NotDuplicateRoleFromUsers(user));
+            entityManager.merge(user);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -66,7 +66,7 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
                 String crypto = new BCryptPasswordEncoder().encode((user.getPassword()));
                 userResult.setPassword(crypto);
             }
-
+            user.setRoles(NotDuplicateRoleFromUsers(user));
             entityManager.merge(userResult);
 
         } catch (Exception ex) {
@@ -113,6 +113,20 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    private Set<Role> NotDuplicateRoleFromUsers(User user) {
+        Set<Role> forUserRoles = new HashSet<>();
+        for (Role roleFromUsers: user.getRoles()) {
+            for (Role role: getAllRoles()) {
+                if (roleFromUsers.getName().equals(role.getName())) {
+                    roleFromUsers.setId(role.getId());
+                    forUserRoles.add(roleFromUsers);
+                    break;
+                }
+            }
+        }
+        return forUserRoles;
     }
 }
 
