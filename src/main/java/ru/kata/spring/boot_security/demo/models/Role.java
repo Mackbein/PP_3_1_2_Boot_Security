@@ -4,7 +4,6 @@ import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -19,7 +18,7 @@ public class Role implements GrantedAuthority {
     private int id;
 
     @ManyToMany(mappedBy = "roles")
-    private Set<User> users= new HashSet<>();
+    private Set<User> users;
 
     @Column
     private String name;
@@ -35,6 +34,7 @@ public class Role implements GrantedAuthority {
     public Role(String name) {
         this.name = name;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -51,7 +51,7 @@ public class Role implements GrantedAuthority {
 
     @Override
     public String toString() {
-        return this.name;
+        return this.name.substring(5).replace("[", "").replace("]", "");
     }
 }
 

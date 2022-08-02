@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -44,22 +43,19 @@ public class User implements UserDetails  {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> roles;
 
     public User() {
 
     }
 
-    public User(String username, String email, int age, String firstName, String lastName) {
+    public User(String username, String email, int age, String firstName, String lastName, Set<Role> roles) {
         this.lastName = lastName;
         this.firstName = firstName;
         this.username = username;
         this.email = email;
         this.age = age;
-    }
-
-    public void addRole(Role role) {
-        this.roles.add(role);
+        this.roles = roles;
     }
 
     @Override
@@ -115,5 +111,14 @@ public class User implements UserDetails  {
                 ", password='" + password + '\'' +
                 ", roles=" + roles +
                 '}';
+    }
+    public String reloadStr() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Role role : this.roles) {
+            String roleN = role.getName().substring(5) + " ";
+            stringBuilder.append(roleN);
+
+        }
+        return String.valueOf(stringBuilder);
     }
 }

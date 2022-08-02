@@ -13,7 +13,7 @@
 <body>
 <div id="header" class="d-flex bg-dark p-0">
     <div th:text="${authorizedUser.username}" class="p-2 text-white font-weight-bold"></div>
-    <div th:text="'with roles: ' + ${authorizedUser.getAuthorities()}" class="p-2 w-100 text-white"></div>
+    <div th:text="'with roles: ' + ${authorizedUser.reloadStr()}" class="p-2 w-100 text-white"></div>
     <a class="p-2 text-secondary text-right text-decoration-none" href="/login?logout">Logout</a>
 </div>
 <div class="row mr-0">
@@ -51,7 +51,7 @@
                                     <th>Username</th>
                                     <th>Age</th>
                                     <th>Email</th>
-                                    <th>Roles</th>
+                                    <th>Role</th>
                                     <th>Edit</th>
                                     <th>Delete</th>
                                 </tr>
@@ -64,7 +64,7 @@
                                     <td th:utext="${user.username}">Username</td>
                                     <td th:utext="${user.age}">age</td>
                                     <td th:utext="${user.email}">email</td>
-                                    <td th:utext="${user.roles}">roles</td>
+                                    <td th:utext="${user.reloadStr()}">roles</td>
                                     <td><a role="button" class="btn btn-primary btn-sm" data-toggle="modal"
                                            data-target="#edit" th:attrappend="data-target=${user.id}">Edit</a>
                                         <div id="edit" class="modal fade" tabindex="-1" role="dialog"
@@ -117,7 +117,7 @@
                                                                         th:multiple="${roles.size()}" required>
                                                                     <option selected>Выберите роль</option>
                                                                     <option th:each="role : ${roles}"
-                                                                            th:value="${role}"
+                                                                            th:value="${role.getId()}"
                                                                             th:text="${role.toString()}">
                                                                     </option>
                                                                 </select>
@@ -262,7 +262,7 @@
                                     <select id="roles" name="roles" class="form-control"
                                             th:multiple="${roles.size()}">
                                         <option th:each="role : ${roles}"
-                                                th:value="${role}"
+                                                th:value="${role.getId()}"
                                                 th:text="${role.toString()}">
                                         </option>
                                     </select>
