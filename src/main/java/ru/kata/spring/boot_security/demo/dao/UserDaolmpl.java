@@ -14,8 +14,7 @@ import ru.kata.spring.boot_security.demo.models.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -49,23 +48,27 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
         try {
             String crypro = new BCryptPasswordEncoder().encode((user.getPassword()));
             user.setPassword(crypro);
-            entityManager.persist(user);
+            user.setRoles(NotDuplicateRoleFromUsers(user));
+            entityManager.merge(user);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     @Transactional
-    public void updateUser(int id, User user) {
+    public void updateUser(User user) {
         try {
-            User userResult = entityManager.find(User.class, id);
+            User userResult = entityManager.find(User.class, user.getId());
+            userResult.setFirstName(user.getFirstName());
+            userResult.setLastName(user.getLastName());
             userResult.setAge(user.getAge());
-            userResult.setUsername(user.getUsername());
             userResult.setEmail(user.getEmail());
-            entityManager.merge(userResult);
 
-            String crypto = new BCryptPasswordEncoder().encode((user.getPassword()));
-            userResult.setPassword(crypto);
+            if (!Objects.equals(userResult.getPassword(), user.getPassword())) {
+                String crypto = new BCryptPasswordEncoder().encode((user.getPassword()));
+                userResult.setPassword(crypto);
+            }
+            user.setRoles(NotDuplicateRoleFromUsers(user));
 
             entityManager.merge(userResult);
 
@@ -85,10 +88,10 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
     }
 
     @Transactional
-    public User findByUsername(String username) {
+    public User findByEmail(String email) {
         try {
-            return (User) entityManager.createQuery("FROM User WHERE username = :username")
-                    .setParameter("username", username)
+            return (User) entityManager.createQuery("FROM User WHERE email = :email")
+                    .setParameter("email", email)
                     .getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
@@ -98,12 +101,34 @@ public class UserDaolmpl implements UserDao, UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = findByUsername(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = findByEmail(email);
         if(user == null) {
-            throw new UsernameNotFoundException(String.format("User '%s' not found", username));
+            throw new UsernameNotFoundException(String.format("User '%s' not found", email));
         }
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getAuthorities());
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), user.getAuthorities());
+    }
+    public List<Role> getAllRoles() {
+        try {
+            return entityManager.createQuery("FROM Role").getResultList();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    private Set<Role> NotDuplicateRoleFromUsers(User user) {
+        Set<Role> forUserRoles = new HashSet<>();
+        for (Role roleFromUsers: user.getRoles()) {
+            for (Role role: getAllRoles()) {
+                if (roleFromUsers.getName().equals(role.getName())) {
+                    roleFromUsers.setId(role.getId());
+                    forUserRoles.add(roleFromUsers);
+                    break;
+                }
+            }
+        }
+        return forUserRoles;
     }
 }
 

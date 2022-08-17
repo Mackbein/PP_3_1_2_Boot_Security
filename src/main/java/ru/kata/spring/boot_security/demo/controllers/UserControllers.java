@@ -23,7 +23,7 @@ public class UserControllers {
 
     @GetMapping()
     public String index(Model model) {
-        User user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         model.addAttribute("user", user);
         return "user/user";
     }

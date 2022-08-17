@@ -2,8 +2,12 @@ package ru.kata.spring.boot_security.demo.service;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.kata.spring.boot_security.demo.dao.UserDao;
+import ru.kata.spring.boot_security.demo.dto.UserDTO;
+import ru.kata.spring.boot_security.demo.dto.UserDtoConverter;
+import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 
 import java.util.List;
@@ -12,30 +16,32 @@ import java.util.List;
 public class UserServicelmpl implements UserService {
 
     private final UserDao userDao;
+    private final UserDtoConverter userDtoConverter;
     @Autowired
-    public UserServicelmpl(UserDao userDao) {
+    public UserServicelmpl(UserDao userDao, UserDtoConverter userDtoConverter) {
         this.userDao = userDao;
+        this.userDtoConverter = userDtoConverter;
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userDao.getAllUsers();
+    public List<UserDTO> getAllUsers() {
+        return userDtoConverter.convertAllUsersInDto(userDao.getAllUsers());
     }
 
     @Override
-    public User getUserById(int id) {
-        return userDao.getUserById(id);
+    public UserDTO getUserById(int id) {
+        return userDtoConverter.convertUserDtoInUser(userDao.getUserById(id));
     }
 
     @Override
-    public void saveUser(User user) {
-        userDao.saveUser(user);
+    public void saveUser(UserDTO userDTO) {
+        userDao.saveUser(userDtoConverter.convertToUserInDto(userDTO));
 
     }
 
     @Override
-    public void updateUser(int id, User user) {
-        userDao.updateUser(id, user);
+    public void updateUser(UserDTO userDTO) {
+        userDao.updateUser(userDtoConverter.convertToUserInDto(userDTO));
     }
 
     @Override
@@ -44,7 +50,17 @@ public class UserServicelmpl implements UserService {
     }
 
     @Override
-    public User findByUsername(String username) {
-        return userDao.findByUsername(username);
+    public User findByEmail(String email) {
+        return userDao.findByEmail(email);
     }
+    @Override
+    public List<Role> getAllRoles() {
+        return userDao.getAllRoles();
+    }
+
+    public UserDTO getAuthorizedUser(){
+        User user = userDao.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+        return userDtoConverter.convertUserDtoInUser(user);
+    }
+
 }
