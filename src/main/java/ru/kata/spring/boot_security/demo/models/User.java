@@ -9,6 +9,7 @@ import javax.persistence.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table
@@ -19,7 +20,10 @@ public class User implements UserDetails  {
     @Column
     private int id;
     @Column
-    private String username;
+    private String firstName;
+
+    @Column
+    private String lastName;
     @Column
     private String email;
     @Column
@@ -28,33 +32,38 @@ public class User implements UserDetails  {
     @Column
     private String password;
 
-    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.REFRESH)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
 
-    private List<Role> roles;
+    private Set<Role> roles;
 
     public User() {
 
     }
 
-    public User(String username, String email, int age) {
-        this.username = username;
+    public User(String firstName, String lastName, String email, int age) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.age = age;
     }
 
-    public void addRole(Role role) {
-        this.roles.add(role);
-    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return getRoles();
     }
+
+    @Override
+    public String getUsername() {
+        return null;
+    }
+
 
     @Override
     public boolean isAccountNonExpired() {
@@ -82,19 +91,20 @@ public class User implements UserDetails  {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id && age == user.age && Objects.equals(username, user.username) && Objects.equals(email, user.email);
+        return id == user.id && age == user.age && Objects.equals(firstName, user.firstName)
+                && Objects.equals(lastName, user.lastName)
+                && Objects.equals(email, user.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, age, email);
+        return Objects.hash(id, firstName, lastName, age, email);
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", age=" + age +
                 ", password='" + password + '\'' +
